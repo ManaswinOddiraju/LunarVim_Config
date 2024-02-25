@@ -75,6 +75,7 @@ lvim.plugins = {
     build = "go build -o $GOPATH/bin/",
     config = function() require('texlabconfig').setup(config) end,
   },
+  "dapt4/vim-autoSurround"
 }
 
 lvim.builtin.dap.active = true
