@@ -45,7 +45,6 @@ vim.api.nvim_create_autocmd("CursorHold", {
     vim.diagnostic.open_float(nil, opts)
   end
 })
-
 -- Installing Plugins
 local config = {
   cache_activate = true,
@@ -75,15 +74,48 @@ lvim.plugins = {
     build = "go build -o $GOPATH/bin/",
     config = function() require('texlabconfig').setup(config) end,
   },
-  "dapt4/vim-autoSurround"
+  "dapt4/vim-autoSurround",
+  'luisiacc/gruvbox-baby',
+  "EdenEast/nightfox.nvim",
+  "rebelot/kanagawa.nvim"
+  -- {
+  --   'folke/styler.nvim',
+  --   config = function()
+  --     require("styler").setup({
+  --       themes = {
+  --         python = { colorscheme = "slate" }
+  --       }
+  --     })
+  --   end
+  -- },
+
 }
+-- Nightfox Setup
+require('nightfox').setup({
+  options = {
+    styles = {           -- Style to be applied to different syntax groups
+      comments = "NONE", -- Value is any valid attr-list value `:help attr-list`
+      conditionals = "NONE",
+      constants = "NONE",
+      functions = "italic",
+      keywords = "NONE",
+      numbers = "NONE",
+      operators = "NONE",
+      strings = "NONE",
+      types = "NONE",
+      variables = "NONE",
+    }
+  }
+})
+--
 
 lvim.builtin.dap.active = true
 local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
 pcall(function()
   require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python")
 end)
-lvim.colorscheme = "slate"
+lvim.colorscheme = "nightfox"
+-- vim.opt.background = "dark"
 -- Latex Config
 local executable = 'zathura'
 local args = {
@@ -116,7 +148,7 @@ require("lvim.lsp.manager").setup("texlab", {
         args = args,
       },
       chktex = {
-        onOpenAndSave = true,
+        onOpenAndSave = false,
         onEdit = false
       },
       diagnosticsDelay = 300,
