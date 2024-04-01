@@ -9,8 +9,18 @@ lvim.builtin.treesitter.ensure_installed = {
 
 -- lsp
 lvim.lsp.installer.setup.ensure_installed = {
-  "pyright", "texlab",
+  "pyright", -- "texlab",
 }
+require("nvim-treesitter.configs").setup({
+  highlight = {
+    enable = true,
+    disable = { "latex" },
+    additional_vim_regex_highlighting = { "latex" },
+  },
+  --other treesitter settings
+})
+-- vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "texlab" })
+
 --formatters
 local formatters = require "lvim.lsp.null-ls.formatters"
 require("lvim.lsp.manager").setup("marksman")
@@ -22,12 +32,11 @@ formatters.setup {
   },
 }
 lvim.format_on_save.enabled = true
-
 vim.diagnostic.config({
   virtual_text = false,
   signs = true,
   underline = true,
-  update_in_insert = true,
+  update_in_insert = false,
   severity_sort = false,
 })
 
@@ -45,49 +54,43 @@ vim.api.nvim_create_autocmd("CursorHold", {
     vim.diagnostic.open_float(nil, opts)
   end
 })
--- Installing Plugins
-local config = {
-  cache_activate = true,
-  cache_filetypes = { 'tex', 'bib' },
-  cache_root = vim.fn.stdpath('cache'),
-  reverse_search_start_cmd = function()
-    return true
-  end,
-  reverse_search_edit_cmd = vim.cmd.edit,
-  reverse_search_end_cmd = function()
-    return true
-  end,
-  file_permission_mode = 438,
-}
-vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "texlab" })
+-- Theme for Latex
+vim.cmd([[
+autocmd FileType tex colorscheme dayfox
+]])
+-- Enable Relative line numbers
+vim.wo.relativenumber = true
 lvim.plugins = {
   "mfussenegger/nvim-dap-python",
+  -- "hrsh7th/nvim-cmp",
   {
-    "iamcco/markdown-preview.nvim",
-    config = function()
-      vim.fn["mkdp#util#install"]()
-    end,
+    "lervag/vimtex",
+    init = function()
+      -- Define a function to setup VimTeX configuration
+      -- Enable filetype detection and plugin
+      vim.cmd('filetype plugin on')
+      -- Set compiler to use for compiling LaTeX files
+      vim.g.vimtex_compiler_latexmk = {
+        executable = 'latexmk',
+        continuous = 1,
+        options = {
+          '-pdf',
+          '-file-line-error',
+          '-synctex=1',
+          '-interaction=nonstopmode',
+        },
+      }
+      -- Use Zathura as the default PDF viewer
+      vim.g.vimtex_view_method = 'zathura'
+      -- Sync PDF with source
+      vim.g.vimtex_view_general_options = '-x "zathura --synctex-forward=%n:0:%b"'
+      -- Enable automatic completion of LaTeX commands
+      vim.g.vimtex_complete_enabled = 1
+      -- vim.cmd('autocmd BufWritePost *.tex VimtexCompile')
+      -- vim.cmd("set conceallevel=2")
+    end
   },
-  {
-    'f3fora/nvim-texlabconfig',
-    ft = { 'tex', 'bib' },
-    build = "go build -o $GOPATH/bin/",
-    config = function() require('texlabconfig').setup(config) end,
-  },
-  "dapt4/vim-autoSurround",
-  'luisiacc/gruvbox-baby',
   "EdenEast/nightfox.nvim",
-  "rebelot/kanagawa.nvim"
-  -- {
-  --   'folke/styler.nvim',
-  --   config = function()
-  --     require("styler").setup({
-  --       themes = {
-  --         python = { colorscheme = "slate" }
-  --       }
-  --     })
-  --   end
-  -- },
 
 }
 -- Nightfox Setup
@@ -114,52 +117,12 @@ local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
 pcall(function()
   require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python")
 end)
-lvim.colorscheme = "nightfox"
--- vim.opt.background = "dark"
--- Latex Config
-local executable = 'zathura'
-local args = {
-  '--synctex-editor-command',
-  [[nvim-texlabconfig -file '%%%{input}' -line %%%{line} -server ]] .. vim.v.servername,
-  '--synctex-forward',
-  '%l:1:%f',
-  '%p',
-}
-require("lvim.lsp.manager").setup("texlab", {
-  settings = {
-    -- latex = {
-    --   build = {
-    --     args = {
-    --       "-pdf", "-synctex=1", "-pv", "-interaction=nonstopmode", "-outdir=build"
-    --     }
-    --   }
-    -- },
-    texlab = {
-      rootDirectory = nil,
-      build = {
-        executable = "latexmk",
-        args = { "-shell-escape", "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
-        onSave = true,
-        forwardSearchAfter = false,
-      },
-      auxDirectory = '.',
-      forwardSearch = {
-        executable = executable,
-        args = args,
-      },
-      chktex = {
-        onOpenAndSave = false,
-        onEdit = false
-      },
-      diagnosticsDelay = 300,
-    },
-  },
-})
+lvim.colorscheme = "duskfox"
 -- Build Options
 ---- keymappings
 lvim.leader = "space"
 lvim.builtin.which_key.mappings["x"] = {
   name = "+LaTeX",
-  c = { "<cmd>TexlabBuild<cr>", "Compile" },
-  x = { "<cmd>TexlabForward<cr>", "Compile and Search" },
+  c = { "<cmd>VimtexCompile<cr>", "Compile" },
+  x = { "<cmd>VimtexView<cr>", "Compile and Search" },
 }
