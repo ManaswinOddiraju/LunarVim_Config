@@ -19,6 +19,10 @@ require("nvim-treesitter.configs").setup({
   },
   --other treesitter settings
 })
+
+-- require 'luasnip'.snippets = {
+--   tex = require '/home/manaswin/.config/lvim/luasnippets/latex'
+-- }
 -- vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "texlab" })
 
 --formatters
@@ -55,9 +59,11 @@ vim.api.nvim_create_autocmd("CursorHold", {
   end
 })
 -- Theme for Latex
+
 vim.cmd([[
 autocmd FileType tex colorscheme dayfox
 ]])
+
 -- Enable Relative line numbers
 vim.wo.relativenumber = true
 lvim.plugins = {
@@ -74,7 +80,7 @@ lvim.plugins = {
         executable = 'latexmk',
         continuous = 1,
         options = {
-          '-pdf',
+          '-xelatex',
           '-file-line-error',
           '-synctex=1',
           '-interaction=nonstopmode',
@@ -91,7 +97,6 @@ lvim.plugins = {
     end
   },
   "EdenEast/nightfox.nvim",
-
 }
 -- Nightfox Setup
 require('nightfox').setup({
