@@ -19,9 +19,9 @@ require("nvim-treesitter.configs").setup({
   },
   --other treesitter settings
 })
-
+require("luasnip.loaders.from_lua").lazy_load { paths = "~/.config/lvim/luasnippets" }
 -- require 'luasnip'.snippets = {
---   tex = require '/home/manaswin/.config/lvim/luasnippets/latex'
+--   tex = require '/home/manaswin/.config/lvim/luasnippets/latex.lua'
 -- }
 -- vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "texlab" })
 
