@@ -9,7 +9,7 @@ lvim.builtin.treesitter.ensure_installed = {
 
 -- lsp
 lvim.lsp.installer.setup.ensure_installed = {
-  "pyright", -- "texlab",
+  "pyright", "texlab",
 }
 require("nvim-treesitter.configs").setup({
   highlight = {
@@ -20,12 +20,16 @@ require("nvim-treesitter.configs").setup({
   --other treesitter settings
 })
 require("luasnip.loaders.from_lua").lazy_load { paths = "~/.config/lvim/luasnippets" }
--- require 'luasnip'.snippets = {
---   tex = require '/home/manaswin/.config/lvim/luasnippets/latex.lua'
--- }
 -- vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "texlab" })
 
 --formatters
+local capabilities = require("lvim.lsp").common_capabilities()
+require("lvim.lsp.manager").setup("texlab", {
+  on_attach = require("lvim.lsp").common_on_attach,
+  on_init = require("lvim.lsp").common_on_init,
+  capabilities = capabilities,
+})
+
 local formatters = require "lvim.lsp.null-ls.formatters"
 require("lvim.lsp.manager").setup("marksman")
 formatters.setup {
@@ -33,9 +37,16 @@ formatters.setup {
     name = "black",
     extra_args = { "--line-length", "88" },
     filetypes = { "python" }
-  },
+  }
 }
+-- formatters.setup {
+--   {
+--     name = "latexindent",
+--     filetypes = { "tex" }
+--   }
+-- }
 lvim.format_on_save.enabled = true
+lvim.format_on_save.timeout = 10000
 vim.diagnostic.config({
   virtual_text = false,
   signs = true,
@@ -69,6 +80,7 @@ vim.wo.relativenumber = true
 lvim.plugins = {
   "mfussenegger/nvim-dap-python",
   -- "hrsh7th/nvim-cmp",
+  'rbberger/vim-singularity-syntax',
   {
     "lervag/vimtex",
     init = function()
@@ -130,4 +142,11 @@ lvim.builtin.which_key.mappings["x"] = {
   name = "+LaTeX",
   c = { "<cmd>VimtexCompile<cr>", "Compile" },
   x = { "<cmd>VimtexView<cr>", "Compile and Search" },
+}
+
+lvim.builtin.which_key.mappings["l"]["f"] = {
+  function()
+    require("lvim.lsp.utils").format { timeout_ms = 10000 }
+  end,
+  "Format",
 }
