@@ -9,7 +9,7 @@ lvim.builtin.treesitter.ensure_installed = {
 
 -- lsp
 lvim.lsp.installer.setup.ensure_installed = {
-  "pyright", "texlab",
+  "pyright", "texlab", "marksman"
 }
 require("nvim-treesitter.configs").setup({
   highlight = {
@@ -79,7 +79,6 @@ autocmd FileType tex colorscheme dayfox
 vim.wo.relativenumber = true
 lvim.plugins = {
   "mfussenegger/nvim-dap-python",
-  -- "hrsh7th/nvim-cmp",
   'rbberger/vim-singularity-syntax',
   {
     "lervag/vimtex",
